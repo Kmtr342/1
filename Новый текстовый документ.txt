@@ -1,0 +1,96 @@
+import pygame
+from random import uniform as func
+from time import sleep
+
+pygame.init()
+
+WIDTH, HEIGHT = 400, 600
+win = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Моя гра")
+clock = pygame.time.Clock()
+bound = 5  
+c2s = 40  
+white = (255, 255, 255)
+black = (0, 0, 0)
+score = 0
+game_over = True
+x, y = WIDTH // 2, HEIGHT // 2
+radius = 10
+velocity = 8
+vx = velocity * func(-1, 1)
+vy = velocity * func(-1, 1)
+height = 10
+width = 80
+xp = (WIDTH - width) // 2
+yp = HEIGHT - height
+vp = 10  
+border_u = bound + radius
+border_l = bound + radius
+border_r = WIDTH - bound - radius
+border_d = HEIGHT - bound - radius
+
+def drawWindow():
+    win.fill(black)
+    pygame.draw.rect(win, white, (0, 0, WIDTH, bound))  
+    pygame.draw.rect(win, white, (0, 0, bound, HEIGHT))  
+    pygame.draw.rect(win, white, (WIDTH - bound, 0, bound, HEIGHT))  
+    pygame.draw.rect(win, white, (xp, yp, width, height))  
+    pygame.draw.circle(win, white, (int(x), int(y)), radius)  
+    pygame.display.update()
+
+def drawScore():
+    win.fill(black)  
+    pygame.font.init() 
+    font = pygame.font.SysFont('arial', 30)  
+    text = font.render(f'КІлькість балів: {score}', True, white)  
+    win.blit(text, (WIDTH // 2 - 70, HEIGHT // 2 - 35))  
+    pygame.display.update()  
+
+def drawGameOver():
+    win.fill(black)  
+    pygame.font.init()  
+    font = pygame.font.SysFont('arial', 30)  
+    text = font.render('Кінець гри :(', True, white)  
+    win.blit(text, (WIDTH // 2 - 70, HEIGHT // 2 - 65))  
+    pygame.display.update() 
+
+run = True
+while run:
+    clock.tick(c2s)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+    if game_over:
+        x += vx
+        y += vy
+        if y + radius > HEIGHT:
+            game_over = False  
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and xp > bound:
+            xp -= vp
+        if keys[pygame.K_RIGHT] and xp < WIDTH - width - bound:
+            xp += vp
+
+        if x + vx < border_l or x + vx > border_r:
+            vx = -vx
+        if y + vy < border_u:
+            vy = -vy
+        if xp <= x <= xp + width and y + radius >= yp:
+            vy = -vy
+            vx *= 1.5
+            vy *= 1.5
+            score += 1  
+        drawWindow()  
+    else:
+        drawGameOver()  
+        sleep(1)
+        drawScore()  
+        sleep(1)
+        game_over = True  
+        x, y = WIDTH // 2, HEIGHT // 2  
+        vx = velocity * func(-1, 1)  
+        vy = velocity * func(-1, 1)  
+        score = 0  
+
+pygame.quit()
